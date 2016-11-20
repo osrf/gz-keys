@@ -116,6 +116,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           this.keytype + '/server/' + this.keyid
         this.clienturl = this.url + '/' +
           this.keytype + '/client/' + this.keyid
+        // notify the others
         this.fire('created', resp)
       },
 
@@ -227,14 +228,6 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         clienturl: {
           type: String,
           value: '',
-          notify: true
-        },
-
-        /// extra creation data (will be added to the response when the create
-        /// event is fire
-        createData: {
-          type: Object,
-          value: {},
           notify: true
         }
       }
