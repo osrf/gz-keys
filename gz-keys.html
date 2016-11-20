@@ -1,0 +1,245 @@
+[[<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<!--
+`gz-keys`
+Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
+
+@demo demo/index.html
+-->
+
+<dom-module id="gz-keys">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-ajax
+      id="ajaxcreate"
+      method="POST"
+      url=[[url]]/[[keytype]]
+      handle-as="json"
+      on-response="_createResponse"
+      on-error="_createError"
+      content-type="application/json"
+      debounce-duration="300"
+    ></iron-ajax>
+
+
+
+    <div id="config" hidden$="[[!config]]">
+
+      <div>
+        <input value="{{url::input}}" placeholder="url (ex: devkeys.cloudsim.io)"></input>
+      </div>
+
+      <div>
+        <input value="{{token::input}}" placeholder="User token"></input>
+        <a href="https://osrf.github.io/gz-token/components/gz-token/demo/">token demo</a>
+      </div>
+
+      <div>
+        <input value="{{keytype::input}}" placeholder="Key type (ex: tap/sasc/key) "></input>
+        tap/sasc/key
+      </div>
+      <hr>
+
+      <h3>Create new "[[keytype]]" key</h3>
+
+      <div>
+        <input id="input" value="{{datatxt::input}}" placeholder="Data (json)"></input>
+        {"name": "demo", "port": 1196}
+      </div>
+
+      <button on-tap="_tapCreate" >Create "[[keytype]]"</button>
+
+
+      <hr>
+      <div>
+        <input id="input" value="{{keyid::input}}" placeholder="key id (vpn-004)"></input>
+        <br>serverurl (server bundle): <a href= "[[serverurl]]">[[serverurl]]</a>
+        <br>clienturl (client bundle): <a href= "[[clienturl]]">[[clienturl]]</a>
+      <div>
+
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'gz-keys',
+
+      /// Create a resource from data
+      create: function(name, port) {
+        // set data
+        this.data = {"name": name, "port": port}
+        // delegate to _createRequest
+        this._createRequest()
+      },
+
+      /// Create resource
+      /// Tap resource delete button on config
+      _tapCreate: function() {
+        try {
+          this.data = JSON.parse(this.datatxt)
+        }
+        catch(e) {
+          const msg = "Create resource error: Couldn't parse json: " + e
+          this.fire('error', msg,  {bubbles: this.bubbles})
+          return
+        }
+        // now that data is set, perform the ajax operation
+        this._createRequest()
+      },
+
+      /// implementation of the create
+      _createRequest: function() {
+        this.$.ajaxcreate.headers.authorization = this.token.trim()
+        this.$.ajaxcreate.body = this.data
+        this.$.ajaxcreate.generateRequest()
+      },
+
+      // response handler for resource creation
+      _createResponse: function() {
+        const resp = this.$.ajaxcreate.lastResponse
+        console.assert(resp)
+        if (resp.hasOwnProperty('success') && resp.success == false) {
+          const msg = 'Failed to create ' + this.resourcename
+          console.error(msg)
+          this.fire('error', msg, {bubbles: this.bubbles})
+          return
+        }
+        this.keyid = resp.id
+        this.serverurl = this.url + '/' +
+          this.keytype + '/server/' + this.keyid
+        this.clienturl = this.url + '/' +
+          this.keytype + '/client/' + this.keyid
+        this.fire('created', resp)
+      },
+
+      _createError: function(err) {
+        this._errorHelper(err, 'Error creating '+ this.resourcename )
+      },
+
+      _errorHelper: function(err, msg) {
+        let ajax = err.target
+        if(!ajax) {
+          console.error("ajax expected")
+        }
+        else{
+          if(!ajax.lastError) {
+            this.log("no lastError!")
+          }
+          else {
+            if(!ajax.lastError.response) {
+              if (err.detail.error.message) {
+                msg += ": " + err.detail.error.message
+              }
+              else {
+                msg += ": no response"
+              }
+            }
+            else {
+              // if there was a response, look for an object
+              // with a message / error / msg attribute
+              const res = ajax.lastError.response
+              try {
+                const json = typeof (res) === "object"? res: JSON.parse(res)
+                if(json.error)
+                  msg += ": " + json.error
+                if(json.msg)
+                  msg += ": " + json.msg
+                if(json.message)
+                  msg += ": " + json.message
+              }
+              catch(err) {
+                // the error is not formatted as expected
+                // add the entire response
+                msg += ": " + res
+              }
+            }
+          }
+        }
+        console.error(msg)
+        this.fire('error', msg,  {bubbles: this.bubbles})
+      },
+
+      properties: {
+        /// Show or hide the configuration UI
+        config: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+
+        /// When true, error events bubble upstream
+        bubbles: {
+          type: Boolean,
+          value: true
+        },
+
+        /// cloudsim-auth user token
+        token: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        /// Key server URL. This should point to a valid resource server
+        url: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        /// Key type:
+        keytype: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        /// Key id:
+        keyid: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+
+        /// JSON data used to create a key.
+        data: {
+          type: Object,
+          value: {},
+          notify: true
+        },
+
+        /// link to download the server bundle
+        serverurl: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        /// link to download client vpn key
+        clienturl: {
+          type: String,
+          value: '',
+          notify: true
+        },
+
+        /// extra creation data (will be added to the response when the create
+        /// event is fire
+        createData: {
+          type: Object,
+          value: {},
+          notify: true
+        }
+      }
+    })
+  </script>
+</dom-module>
+
+
