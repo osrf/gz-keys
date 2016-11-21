@@ -19,7 +19,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
     <iron-ajax
       id="ajaxcreate"
       method="POST"
-      url=[[url]]/[[keytype]]
+      url=[[url]]/[[keytype]]/key
       handle-as="json"
       on-response="_createResponse"
       on-error="_createError"
@@ -32,17 +32,17 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
     <div id="config" hidden$="[[!config]]">
 
       <div>
-        <input value="{{url::input}}" placeholder="url (ex: devkeys.cloudsim.io)"></input>
+        <input value="{{url::input}}" placeholder="url property (ex: devkeys.cloudsim.io)"></input>
       </div>
 
       <div>
-        <input value="{{token::input}}" placeholder="User token"></input>
+        <input value="{{token::input}}" placeholder="token property"></input>
         <a href="https://osrf.github.io/gz-token/components/gz-token/demo/">token demo</a>
       </div>
 
       <div>
-        <input value="{{keytype::input}}" placeholder="Key type (ex: tap/sasc/key) "></input>
-        tap/sasc/key
+        <input value="{{keytype::input}}" placeholder="keytype property (ex: tap/sasc) "></input>
+        tap/sasc
       </div>
       <hr>
 
@@ -55,12 +55,22 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
 
       <button on-tap="_tapCreate" >Create "[[keytype]]"</button>
 
-
       <hr>
+      <h3>Download urls</h3>
       <div>
-        <input id="input" value="{{keyid::input}}" placeholder="key id (vpn-004)"></input>
-        <br>serverurl (server bundle): <a href= "[[serverurl]]">[[serverurl]]</a>
-        <br>clienturl (client bundle): <a href= "[[clienturl]]">[[clienturl]]</a>
+        <input id="input" value="{{keyid::input}}" placeholder="keyid property (ex: vpn-004)"></input>
+        vpn-001
+        <br>serverurl (server bundle): <a href= "[[serverurl]]">server bundle</a>
+        <br>[[serverurl]]
+      </div>
+
+      <div>
+        <input id="input" value="{{clientid::input}}" placeholder="clientid property (ex: ocu-01)"></input>
+      </div>
+      <div>
+        <input id="input" value="{{serverip::input}}" placeholder="serverip property"></input>
+        <br>clienturl (client bundle): <a href= "[[clienturl]]">client bundle</a>
+        <br>[[clienturl]]
       <div>
 
     </div>
@@ -98,7 +108,8 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
       _createRequest: function() {
         this.$.ajaxcreate.headers.authorization = this.token.trim()
         this.$.ajaxcreate.body = this.data
-        this.$.ajaxcreate.generateRequest()
+        const request = this.$.ajaxcreate.generateRequest()
+        console.log(request, 'key creation request')
       },
 
       // response handler for resource creation
@@ -112,12 +123,34 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           return
         }
         this.keyid = resp.id
-        this.serverurl = this.url + '/' +
-          this.keytype + '/server/' + this.keyid
-        this.clienturl = this.url + '/' +
-          this.keytype + '/client/' + this.keyid
+
         // notify the others
         this.fire('created', resp)
+      },
+
+      _computeServerUrl: function(url, keytype, keyid, token) {
+        const uri = url +
+          '/' + keytype + '/server' +
+          '/' + keyid +
+          '?token=' + token
+        return encodeURI(uri)
+      },
+
+      _computeClientUrl: function(
+        url,
+        keytype,
+        keyid,
+        clientid,
+        serverip,
+        token
+      ) {
+        const uri = url +
+          '/' + keytype + '/client' +
+          '/' + keyid +
+          '?token=' + token +
+          '&clientId=' + clientid +
+          '&serverIp=' + serverip
+        return encodeURI(uri)
       },
 
       _createError: function(err) {
@@ -209,7 +242,6 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           notify: true
         },
 
-
         /// JSON data used to create a key.
         data: {
           type: Object,
@@ -217,18 +249,35 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           notify: true
         },
 
-        /// link to download the server bundle
-        serverurl: {
+        clientid: {
           type: String,
           value: '',
           notify: true
         },
 
-        /// link to download client vpn key
-        clienturl: {
+        serverip: {
           type: String,
           value: '',
           notify: true
+        },
+
+        /// link to download the server bundle
+        serverurl: {
+          type: String,
+          readOnly: true,
+          value: '',
+          notify: true,
+          computed: '_computeServerUrl(url, keytype, keyid, token)'
+        },
+
+        /// link to download client vpn key
+        clienturl: {
+          type: String,
+          readOnly: true,
+          value: '',
+          notify: true,
+          computed:  '_computeClientUrl(' +
+            'url, keytype, keyid, clientid, serverip, token)'
         }
       }
     })

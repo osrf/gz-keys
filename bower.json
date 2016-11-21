@@ -3,7 +3,8 @@
   "description": "Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)",
   "main": "gz-keys.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0"
+    "polymer": "Polymer/polymer#^1.4.0",
+    "iron-ajax": "^1.4.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
