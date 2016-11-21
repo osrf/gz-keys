@@ -1,4 +1,14 @@
-# \<gz-keys\>
+[ ![Codeship Status for osrf/gz-]()
+
+[![GitHub version](https://badge.fury.io/gh/osrf%2Fgz-keys.svg)](https://badge.fury.io/gh/osrf%2Fgz-KEYS)
+
+[![Dependency Status](https://www)
+
+# \<gz-Keys\>
+
+documentation: [https://osrf.github.io/gz-keys/components/gz-keys](https://osrf.github.io/gz-token/components/gz-keys)
+
+demo: [https://osrf.github.io/gz-keys/components/gz-keys/demo](https://osrf.github.io/gz-token/components/gz-keys/demo)
 
 Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
 
