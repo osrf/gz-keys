@@ -27,8 +27,6 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
       debounce-duration="300"
     ></iron-ajax>
 
-
-
     <div id="config" hidden$="[[!config]]">
 
       <div>
@@ -81,7 +79,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
 
       is: 'gz-keys',
 
-      /// Create a resource from data
+      // Create a resource from data
       create: function(name, port) {
         // set data
         this.data = {"name": name, "port": port}
@@ -89,8 +87,8 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         this._createRequest()
       },
 
-      /// Create resource
-      /// Tap resource delete button on config
+      // Create resource
+      // Tap resource delete button on config
       _tapCreate: function() {
         try {
           this.data = JSON.parse(this.datatxt)
@@ -104,12 +102,11 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         this._createRequest()
       },
 
-      /// implementation of the create
+      // implementation of the create
       _createRequest: function() {
         this.$.ajaxcreate.headers.authorization = this.token.trim()
         this.$.ajaxcreate.body = this.data
         const request = this.$.ajaxcreate.generateRequest()
-        console.log(request, 'key creation request')
       },
 
       // response handler for resource creation
@@ -134,6 +131,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         this.fire('created', resp)
       },
 
+      // Helper function to assemble the server URL
       _computeServerUrl: function(url, keytype, keyid, token) {
         let uri = url +
           '/' + keytype + '/server' +
@@ -143,6 +141,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         return encodeURI(uri)
       },
 
+      // Helper function to assemble the client URL
       _computeClientUrl: function(
         url,
         keytype,
@@ -162,10 +161,12 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         return encodeURI(uri)
       },
 
+      // On error response from server
       _createError: function(err) {
-        this._errorHelper(err, 'Error creating '+ this.resourcename )
+        this._errorHelper(err, 'Error creating '+ this.resourcename)
       },
 
+      // Helper to handle error messages
       _errorHelper: function(err, msg) {
         let ajax = err.target
         if(!ajax) {
@@ -210,76 +211,81 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
       },
 
       properties: {
-        /// Show or hide the configuration UI
+        // Show or hide the configuration UI
         config: {
           type: Boolean,
           value: false,
           notify: true
         },
 
-        /// When true, error events bubble upstream
+        // When true, error events bubble upstream
         bubbles: {
           type: Boolean,
           value: true
         },
 
-        /// cloudsim-auth user token
+        // cloudsim-auth user token
         token: {
           type: String,
           value: '',
           notify: true
         },
 
-        /// Key server URL. This should point to a valid resource server
+        // Key server URL. This should point to a valid resource server
         url: {
           type: String,
           value: '',
           notify: true
         },
 
-        /// Key type:
+        // Key type:
         keytype: {
           type: String,
           value: '',
           notify: true
         },
 
-        /// Key id:
+        // Key id:
         keyid: {
           type: String,
           value: '',
           notify: true
         },
 
-        /// JSON data used to create a key.
+        // JSON data used to create a key.
         data: {
           type: Object,
           value: {},
           notify: true
         },
 
+        // String uniquely identifying client
         clientid: {
           type: String,
           value: '',
           notify: true
         },
 
+        // Server ip
         serverip: {
           type: String,
           value: '',
           notify: true
         },
+
         // when true, it adds the token to serverurl and clienturl
         addTokenToClientRoute: {
           type: Boolean,
           value: true
         },
+
         // when true, it adds the token to serverurl and clienturl
         addTokenToServerRoute: {
           type: Boolean,
           value: false
         },
-        /// link to download the server bundle
+
+        // link to download the server bundle
         serverurl: {
           type: String,
           readOnly: true,
@@ -288,7 +294,7 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           computed: '_computeServerUrl(url, keytype, keyid, token)'
         },
 
-        /// link to download client vpn key
+        // link to download client vpn key
         clienturl: {
           type: String,
           readOnly: true,
