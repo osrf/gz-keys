@@ -80,9 +80,9 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
       is: 'gz-keys',
 
       // Create a resource from data
-      create: function(name, port) {
+      create: function(data) {
         // set data
-        this.data = {"name": name, "port": port}
+        this.data = data}
         // delegate to _createRequest
         this._createRequest()
       },
