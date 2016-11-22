@@ -1,4 +1,4 @@
-[ ![Codeship Status for osrf/gz-]()
+[ ![Codeship Status for osrf/cloudsim-keys](https://codeship.com/projects/196a88f0-52b2-0134-2889-02adab5d782c/status?branch=master)](https://codeship.com/projects/171619)
 
 [![GitHub version](https://badge.fury.io/gh/osrf%2Fgz-keys.svg)](https://badge.fury.io/gh/osrf%2Fgz-KEYS)
 
