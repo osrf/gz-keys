@@ -123,16 +123,18 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           return
         }
         this.keyid = resp.id
-
+        resp.serverRoute = this.serverurl
+        resp.clientroute = this.clienturl
         // notify the others
         this.fire('created', resp)
       },
 
       _computeServerUrl: function(url, keytype, keyid, token) {
-        const uri = url +
+        let uri = url +
           '/' + keytype + '/server' +
-          '/' + keyid +
-          '?token=' + token
+          '/' + keyid
+        if (this.addTokenToServerRoute)
+          uri +=  '?token=' + token
         return encodeURI(uri)
       },
 
@@ -144,12 +146,14 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
         serverip,
         token
       ) {
-        const uri = url +
+        let uri = url +
           '/' + keytype + '/client' +
           '/' + keyid +
-          '?token=' + token +
-          '&clientId=' + clientid +
+          '?id=' + clientid +
           '&serverIp=' + serverip
+        if (this.addTokenToClientRoute) {
+          uri += '&token=' + this.token
+        }
         return encodeURI(uri)
       },
 
@@ -260,7 +264,16 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
           value: '',
           notify: true
         },
-
+        // when true, it adds the token to serverurl and clienturl
+        addTokenToClientRoute: {
+          type: Boolean,
+          value: true
+        },
+        // when true, it adds the token to serverurl and clienturl
+        addTokenToServerRoute: {
+          type: Boolean,
+          value: false
+        },
         /// link to download the server bundle
         serverurl: {
           type: String,
