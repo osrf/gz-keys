@@ -113,9 +113,14 @@ Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
       },
 
       // response handler for resource creation
-      _createResponse: function() {
-        const resp = this.$.ajaxcreate.lastResponse
+      _createResponse: function(req) {
+        let resp
+        if (req && req.detail && req.detail.response)
+          resp = req.detail.response
+        else
+          resp = this.$.ajaxcreate.lastResponse
         console.assert(resp)
+
         if (resp.hasOwnProperty('success') && resp.success == false) {
           const msg = 'Failed to create ' + this.resourcename
           console.error(msg)
