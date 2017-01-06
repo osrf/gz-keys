@@ -6,9 +6,9 @@
 
 # \<gz-Keys\>
 
-documentation: [https://osrf.github.io/gz-keys/components/gz-keys](https://osrf.github.io/gz-token/components/gz-keys)
+documentation: [https://osrf.github.io/gz-keys/components/gz-keys](https://osrf.github.io/gz-keys/components/gz-keys)
 
-demo: [https://osrf.github.io/gz-keys/components/gz-keys/demo](https://osrf.github.io/gz-token/components/gz-keys/demo)
+demo: [https://osrf.github.io/gz-keys/components/gz-keys/demo](https://osrf.github.io/gz-keys/components/gz-keys/demo)
 
 Access Cloudsim-keys server (ex: https://devkeys.cloudsim.io)
 
